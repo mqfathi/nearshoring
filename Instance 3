@@ -139,7 +139,7 @@ for k in K:
     q_k_max[k] = random.uniform(200, 500)
 
 for i in I:
-    varphi[i] = round(random.uniform(0.1, 0.2), 2)  # Assigning random values between 0 and 20
+    varphi[i] = round(random.uniform(0.2, 0.4), 2)  # Assigning random values between 0 and 20
 
 # Update t_ij calculation to include the corrected h_i
 # Assuming varphi is applied correctly as a scaling factor for d_ij to time, and h_i adds a fixed service time at node i
