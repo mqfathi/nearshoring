@@ -1,1 +1,371 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+data = [
+{'L_emissions': 1741342.2, 'L_profit': 43198335.0, 'follower_objective': 98723},
+{'L_emissions': 1745067.2, 'L_profit': 43360258.0, 'follower_objective': 98913},
+{'L_emissions': 1754155.2, 'L_profit': 43548904.0, 'follower_objective': 99295},
+{'L_emissions': 1743245.2, 'L_profit': 43360124.0, 'follower_objective': 98634},
+{'L_emissions': 1736283.2, 'L_profit': 43054844.0, 'follower_objective': 98107},
+{'L_emissions': 1733829.2, 'L_profit': 42933358.0, 'follower_objective': 97995},
+{'L_emissions': 1726045.2, 'L_profit': 43044496.0, 'follower_objective': 97825},
+{'L_emissions': 1736793.2, 'L_profit': 43333278.0, 'follower_objective': 98531},
+{'L_emissions': 1741235.2, 'L_profit': 43062618.0, 'follower_objective': 98221},
+{'L_emissions': 1739317.2, 'L_profit': 43143338.0, 'follower_objective': 98349},
+{'L_emissions': 1724033.2, 'L_profit': 42977440.0, 'follower_objective': 97985},
+{'L_emissions': 1738231.2, 'L_profit': 43186266.0, 'follower_objective': 98358},
+{'L_emissions': 1738072.2, 'L_profit': 43244605.0, 'follower_objective': 98478},
+{'L_emissions': 1730811.2, 'L_profit': 43017436.0, 'follower_objective': 97948},
+{'L_emissions': 1744437.2, 'L_profit': 43245688.0, 'follower_objective': 98639},
+{'L_emissions': 1752211.2, 'L_profit': 43403254.0, 'follower_objective': 98995},
+{'L_emissions': 1733104.2, 'L_profit': 43018899.0, 'follower_objective': 98169},
+{'L_emissions': 1736108.2, 'L_profit': 43048041.0, 'follower_objective': 98065},
+{'L_emissions': 1733513.2, 'L_profit': 42971650.0, 'follower_objective': 97855},
+{'L_emissions': 1745099.2, 'L_profit': 43386966.0, 'follower_objective': 98851},
+{'L_emissions': 1729575.2, 'L_profit': 43189228.0, 'follower_objective': 98208},
+{'L_emissions': 1716969.2, 'L_profit': 42743118.0, 'follower_objective': 97235},
+{'L_emissions': 1756028.2, 'L_profit': 43713941.0, 'follower_objective': 99561},
+{'L_emissions': 1718608.2, 'L_profit': 42616885.0, 'follower_objective': 97118},
+{'L_emissions': 1733311.2, 'L_profit': 42949150.0, 'follower_objective': 97829},
+{'L_emissions': 1753436.2, 'L_profit': 43624481.0, 'follower_objective': 99332},
+{'L_emissions': 1732274.2, 'L_profit': 43028169.0, 'follower_objective': 98101},
+{'L_emissions': 1747108.2, 'L_profit': 43246809.0, 'follower_objective': 98550},
+{'L_emissions': 1750042.2, 'L_profit': 43522371.0, 'follower_objective': 99154},
+{'L_emissions': 1713585.2, 'L_profit': 42722416.0, 'follower_objective': 97257},
+]
+
+
+# Create DataFrame
+df = pd.DataFrame(data)
+
+# Sort the DataFrame
+df_sorted = df.sort_values(by=['L_profit', 'L_emissions', 'follower_objective'], ascending=[False, True, True])
+
+# Plotting
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+ax.scatter(df_sorted['L_emissions'], df_sorted['L_profit'], df_sorted['follower_objective'], c='blue', marker='o')
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+plt.title('3D Scatter Plot Sorted by Profit, Emission, and Follower')
+plt.show()
+
+
+# In[2]:
+
+
+import numpy as np
+from scipy.stats import gaussian_kde
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd
+
+# Assuming 'data' and DataFrame 'df' are defined as above
+
+# Generate KDE for Emissions and Profit
+xy = np.vstack([df['L_emissions'], df['L_profit']])
+kde = gaussian_kde(xy)
+
+# Create grid for contour
+xmin, xmax = df['L_emissions'].min(), df['L_emissions'].max()
+ymin, ymax = df['L_profit'].min(), df['L_profit'].max()
+Xgrid, Ygrid = np.meshgrid(np.linspace(xmin, xmax, 50), np.linspace(ymin, ymax, 50))
+Zgrid = kde(np.vstack([Xgrid.ravel(), Ygrid.ravel()])).reshape(Xgrid.shape)
+
+
+
+
+# Plotting
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# 3D scatter plot
+scatter = ax.scatter(df['L_emissions'], df['L_profit'], df['follower_objective'], c='blue', marker='o', depthshade=True)
+
+# Contour plot on the bottom plane
+z_min_offset = df['follower_objective'].min()  # Using the minimum follower objective for the contour base
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+
+# Contour plot on the x, z plane (emissions-follower objective)
+#ax.contour(Xgrid, Zgrid, Zgrid, zdir='y', levels=10, cmap='coolwarm', alpha=0.5)
+
+# Contour plot on the y, z plane (profit-follower objective)
+#ax.contour(XZgrid, Ygrid, zZgrid, zdir='x', offset=xmin, levels=10, cmap='cividis', alpha=0.5)
+
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+# Adjusting z-axis limits to start from the minimum follower objective
+z_min = df['follower_objective'].min()
+z_max = df['follower_objective'].max()
+ax.set_zlim(z_min, z_max)
+
+plt.colorbar(scatter, ax=ax, label='Follower Objective')
+plt.title('3D Scatter Plot with KDE Contours on Emissions-Profit Plane')
+plt.show()
+
+
+# In[3]:
+
+
+import pandas as pd
+import numpy as np
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Normalize the objective functions
+norm_df = pd.DataFrame()
+for col in df.columns:
+    min_val = df[col].min()
+    max_val = df[col].max()
+    norm_df[col] = (df[col] - min_val) / (max_val - min_val)
+
+# Calculate sums for entropy calculation
+D_n = norm_df.sum(axis=1)
+
+# Calculate entropy
+e_n = np.zeros(len(df))
+for i, row in norm_df.iterrows():
+    for col in norm_df.columns:
+        phi = row[col]
+        e_n[i] += (phi / D_n[i]) * np.log(phi / D_n[i])
+
+# Normalize entropy (avoid division by zero)
+e_n = np.nan_to_num(e_n)  # Replace NaNs with zeros
+E = e_n.sum()
+
+# Calculate weights
+W_n = (1 / (len(df) - E) * (1 - e_n)) / ((1 / (len(df) - E) * (1 - e_n)).sum())
+
+# Add calculated weights to DataFrame for visualization
+df['Weight'] = W_n
+
+df.head()  # Show the first few rows to verify the calculations
+
+
+# In[4]:
+
+
+# Adjusting the grid creation for xz and yz contours
+
+# x, z contour grid
+Zgrid_xz, Xgrid_xz = np.meshgrid(np.linspace(df_sorted_corrected['follower_objective'].min(), df_sorted_corrected['follower_objective'].max(), 50), 
+                                 np.linspace(xmin, xmax, 50))
+XZgrid = kde_xz(np.vstack([Xgrid_xz.ravel(), Zgrid_xz.ravel()])).reshape(Xgrid_xz.shape)
+
+# y, z contour grid
+Zgrid_yz, Ygrid_yz = np.meshgrid(np.linspace(df_sorted_corrected['follower_objective'].min(), df_sorted_corrected['follower_objective'].max(), 50), 
+                                 np.linspace(ymin, ymax, 50))
+YZgrid = kde_yz(np.vstack([Ygrid_yz.ravel(), Zgrid_yz.ravel()])).reshape(Ygrid_yz.shape)
+
+# Plotting with corrected ranks annotated and all KDE contours
+fig = plt.figure(figsize=(16, 12))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate each point with its corrected rank
+for i, row in df_sorted_corrected.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Contour plot on the bottom plane (emissions-profit)
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+# Contour plot on the x, z plane (emissions-follower objective)
+ax.contour(Xgrid_xz, Zgrid_xz, XZgrid, zdir='y', offset=ymax, levels=10, cmap='coolwarm', alpha=0.5)
+
+# Contour plot on the y, z plane (profit-follower objective)
+ax.contour(Ygrid_yz, Zgrid_yz, YZgrid, zdir='x', offset=xmin, levels=10, cmap='cividis', alpha=0.5)
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+plt.title('3D Scatter Plot with Corrected Ranks and Multiple KDE Contours')
+plt.show()
+
+
+# In[6]:
+
+
+# Adjust normalization based on preference direction
+norm_df_corrected = pd.DataFrame()
+for col in df.columns[:-1]:  # Exclude the 'Weight' column
+    min_val = df[col].min()
+    max_val = df[col].max()
+    if col == 'L_profit':  # Invert normalization for L_profit
+        norm_df_corrected[col] = (max_val - df[col]) / (max_val - min_val)
+    else:  # Lower is better for L_emissions and follower_objective
+        norm_df_corrected[col] = (df[col] - min_val) / (max_val - min_val)
+
+# Recalculate sums for entropy calculation
+D_n_corrected = norm_df_corrected.sum(axis=1)
+
+# Recalculate entropy
+e_n_corrected = np.zeros(len(df))
+for i, row in norm_df_corrected.iterrows():
+    for col in norm_df_corrected.columns:
+        phi = row[col]
+        e_n_corrected[i] += (phi / D_n_corrected[i]) * np.log(phi / D_n_corrected[i])
+
+# Normalize entropy (avoid division by zero)
+e_n_corrected = np.nan_to_num(e_n_corrected)  # Replace NaNs with zeros
+E_corrected = e_n_corrected.sum()
+
+# Recalculate weights
+W_n_corrected = (1 / (len(df) - E_corrected) * (1 - e_n_corrected)) / ((1 / (len(df) - E_corrected) * (1 - e_n_corrected)).sum())
+
+# Update DataFrame with corrected weights
+df['Weight_corrected'] = W_n_corrected
+
+# Assign ranks based on corrected weights
+df['Rank_corrected'] = df['Weight_corrected'].rank(method='dense', ascending=False)
+
+# Sort data by corrected rank for better visualization
+df_sorted_corrected = df.sort_values(by='Rank_corrected')
+
+# Plotting with corrected ranks annotated
+fig = plt.figure(figsize=(12, 9))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate each point with its corrected rank
+for i, row in df_sorted_corrected.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+plt.title('3D Scatter Plot with Corrected Annotated Ranks')
+plt.show()
+
+
+# In[7]:
+
+
+from scipy.stats import gaussian_kde
+
+# Generate KDE for Emissions and Profit
+xy = np.vstack([df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit']])
+kde = gaussian_kde(xy)
+
+# Create grid for contour
+xmin, xmax = df_sorted_corrected['L_emissions'].min(), df_sorted_corrected['L_emissions'].max()
+ymin, ymax = df_sorted_corrected['L_profit'].min(), df_sorted_corrected['L_profit'].max()
+Xgrid, Ygrid = np.meshgrid(np.linspace(xmin, xmax, 50), np.linspace(ymin, ymax, 50))
+Zgrid = kde(np.vstack([Xgrid.ravel(), Ygrid.ravel()])).reshape(Xgrid.shape)
+
+# Plotting with corrected ranks annotated and KDE contours
+fig = plt.figure(figsize=(14, 10))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate each point with its corrected rank
+for i, row in df_sorted_corrected.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Contour plot on the bottom plane
+z_min_offset = df_sorted_corrected['follower_objective'].min() - 100  # Offset to place contour below the lowest point
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+# Adjusting z-axis limits to ensure contour is visible
+ax.set_zlim(z_min_offset, df_sorted_corrected['follower_objective'].max())
+
+plt.title('3D Scatter Plot with Corrected Annotated Ranks and KDE Contours')
+plt.show()
+
+
+# In[8]:
+
+
+from scipy.stats import gaussian_kde
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Assuming df_sorted_corrected is your DataFrame and it's already sorted by the ranks
+
+# Generate KDE for Emissions and Profit
+xy = np.vstack([df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit']])
+kde = gaussian_kde(xy)
+
+# Create grid for contour
+xmin, xmax = df_sorted_corrected['L_emissions'].min(), df_sorted_corrected['L_emissions'].max()
+ymin, ymax = df_sorted_corrected['L_profit'].min(), df_sorted_corrected['L_profit'].max()
+Xgrid, Ygrid = np.meshgrid(np.linspace(xmin, xmax, 50), np.linspace(ymin, ymax, 50))
+Zgrid = kde(np.vstack([Xgrid.ravel(), Ygrid.ravel()])).reshape(Xgrid.shape)
+
+# Plotting with corrected ranks annotated for top 5 and KDE contours
+fig = plt.figure(figsize=(14, 10))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate top 5 points with their corrected rank
+top_5 = df_sorted_corrected.head(5)  # Get top 5
+for i, row in top_5.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Contour plot on the bottom plane
+z_min_offset = df_sorted_corrected['follower_objective'].min() - 100  # Offset to place contour below the lowest point
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+# Adjusting z-axis limits to ensure contour is visible
+ax.set_zlim(z_min_offset, df_sorted_corrected['follower_objective'].max())
+
+plt.title('3D Scatter Plot with Corrected Annotated Ranks for Top 5 and KDE Contours')
+plt.show()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
 
