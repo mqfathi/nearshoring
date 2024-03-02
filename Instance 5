@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[4]:
 
 
 import random
 
-# In[14]:
+
+# In[5]:
 
 
 p_l = {}
@@ -21,7 +22,7 @@ mu_l = {}
 rho_m = {}
 q_k_max = {}
 h_i1 = {}
-h_i = {}
+h_i={}
 pi_m_max = {}
 s_m_max = {}
 common_jk = {}
@@ -31,47 +32,50 @@ varphi = {}
 q_k_max = {}
 d_m0 = {}
 
-K1 = [1, 2, 3,4,5]
-K2 = [6, 7,8,9,10]
-K3=[11,12,13,14,15]
+K1 = [1,2,3,4,5]
+K2 = [6,7,8,9,10]
+K3 = [11,12,13,14,15]
 K4=[16,17,18,19,20]
-K = K1 + K2+K3+K4
-L = [1, 2, 3]
+K = K1 + K2 + K3+K4
+L= [1,2,3]
 I = list(range(253))
 J = list(range(1, 240))
 H = [241,242,243,244,245,246,247,248,249,250,251,252]
-M = [1, 2, 3,4]  # Update the value of L to
+M = [1,2,3,4] # Update the value of L to 
+
 
 for l in L:
     p_l[l] = random.randint(50, 100)  # Assigning random values between 0 and 20
-
+    
 for j in J:
     for l in L:
         delta_jl[(j, l)] = random.randint(0, 50)  # Assigning random values between 0 and 20
-
+        
 for key in K:
     r_k[key] = random.randint(50, 75)
-
+    
 for i in I:
     for j in I:
         if i != j:
-            d_ij[(i, j)] = random.randint(1, 15)  # Assigning random values between 0 and 20
+            d_ij[(i,j)] = random.randint(1, 15)  # Assigning random values between 0 and 20
         if i == j:
-            d_ij[(i, j)] = 0
+            d_ij[(i,j)] = 0
 
-# In[17]:
+
+# In[6]:
 
 
 d_m0 = {(m, 0): random.randint(1000, 1500) for m in M}
 
 for m in M:
     for l in L:
-        theta_ml[(m, l)] = random.randint(20, 45)
-
+        theta_ml[(m,l)] = random.randint(20, 45)
+        
 for k in K:
-    c_k[k] = round(random.uniform(1, 1.5), 1)  # Adjust the range as needed
+    c_k[k] =  round(random.uniform(1, 1.5), 1)  # Adjust the range as needed
 
-# In[21]:
+
+# In[11]:
 
 
 for key in K:
@@ -80,30 +84,36 @@ for key in K:
 for m in M:
     rho_m[m] = random.randint(200, 350)  # Assigning random values between 0 and 20
 
+
 for l in L:
     mu_l[l] = random.randint(1, 5)  # Assigning random values between 0 and 20
 
-for m in M:
-    for l in L:
-        beta_ml[(m, l)] = random.randint(10, 20)  # Assigning random values between 0 and 20
 
 for m in M:
     for l in L:
-        epsilon_ml[(m, l)] = random.randint(30, 350)  # Assigning random values between 0 and 20
+        beta_ml[(m,l)] = random.randint(10, 20)  # Assigning random values between 0 and 20
+
+for m in M:
+    for l in L:
+        epsilon_ml[(m,l)] = random.randint(30, 350)  # Assigning random values between 0 and 20
+
 
 for key in M:
     s_m_max[key] = random.randint(300, 800)  # Assigning random values between 0 and 20
 
+
 for idx in I:
     h_i1[idx] = round(random.uniform(20, 60), 2)  # Assigning random values between 3 and 4 (inclusive)
 
+
 # Divide h_i1 values by 60 to convert minutes to hours
 h_i = {key: value / 60 for key, value in h_i1.items()}
-
+    
+    
 for i in I:
     for j in J:
         for k in K:
-            e_ijk[i, j, k] = round(random.uniform(0.3, 1.2), 2)
+            e_ijk[i, j, k] = round(random.uniform(0.1, 1), 2)
 
 for j in J:
     for k in K:
@@ -118,15 +128,22 @@ for j in J:
 for key in M:
     pi_m_max[key] = random.randint(500, 1000)  # Assigning random values between 0 and 20
 
+    
+    
 r_max = round(random.uniform(8, 12), 2)
 gamma = random.randint(10, len(J))
-Lambda = random.randint(10, len(J))
-g_min = random.randint(2500, 5000)
+Lambda = random.randint(10,len(J))
+g_min = random.randint(2500000,5000000)
 
 
-varepsilon = round(random.uniform(0.1, 1), 2)  # Assigning random values between 0 and 20
 
-# Define Sets and Indice
+varepsilon = round(random.uniform(0.1, 1), 2)    # Assigning random values between 0 and 20
+
+
+
+for i in I:
+    varphi[i] = round(random.uniform(0.2, 0.4), 2)    # Assigning random values between 0 and 20
+
 
 Omega_jh = {(j, h): 0 for j in J for h in H}
 
@@ -135,118 +152,117 @@ for j in J:
     # Randomly choose a hub for this customer
     assigned_hub = random.randint(1, len(H))
     Omega_jh[(j, assigned_hub)] = random.randint(0, 1)
+    
+    
 
 
-for i in I:
-    varphi[i] = round(random.uniform(0.2, 0.4), 2)  # Assigning random values between 0 and 20
 
 # Update t_ij calculation to include the corrected h_i
 # Assuming varphi is applied correctly as a scaling factor for d_ij to time, and h_i adds a fixed service time at node i
-t_ij = {key: d_ij[key] * varphi[key[1]] + h_i[key[1]] if key[1] in h_i else d_ij[key] * varphi[key[1]] for key in d_ij}
+t_ij = {key: d_ij[key] * varphi[key[1]] + h_i[key[1]] if key[1] in h_i else d_ij[key] * varphi[key[1]] for key in d_ij}    
 
-# In[23]:
+
+# In[5]:
 
 
 import pulp
 import numpy as np
-
 
 def customer_selection(J, L, K, H, p_l, f_jlk, delta_jl, Omega_jh, Lambda):
     # Initialize decision variable X
     X = {j: 0 for j in J}
     best_profit = -np.inf
     best_X = None
-
+    
     # Initialize an initial solution randomly
     selected_customers = random.sample(J, Lambda)
     for j in selected_customers:
         X[j] = 1
-
+    
     # Calculate the initial profit
-    profit = sum(p_l[l] + f_jlk[j, l, k] * (1 - Omega_jh[j, h]) * delta_jl[j, l]
+    profit = sum(p_l[l] + f_jlk[j, l, k]*(1-Omega_jh[j, h])*delta_jl[j, l] 
                  for j in J for l in L for k in K for h in H if X[j] == 1)
     if profit > best_profit:
         best_profit = profit
         best_X = X.copy()
-
+    
     # Generate all possible combinations of (0,1) in X
     for j in J:
         X_temp = X.copy()
         X_temp[j] = 1 - X_temp[j]  # Toggle the selection of customer j
-        profit_temp = sum(p_l[l] + f_jlk[j, l, k] * (1 - Omega_jh[j, h]) * delta_jl[j, l]
+        profit_temp = sum(p_l[l] + f_jlk[j, l, k]*(1-Omega_jh[j, h])*delta_jl[j, l] 
                           for j in J for l in L for k in K for h in H if X_temp[j] == 1)
-
+        
         # If the new profit is better, update best_X and best_profit
         if profit_temp > best_profit:
             best_profit = profit_temp
             best_X = X_temp.copy()
-
+    
     return best_X
 
 
-# In[24]:
+# In[6]:
 
 
 best_X = customer_selection(J, L, K, H, p_l, f_jlk, delta_jl, Omega_jh, Lambda)
 
-# In[25]:
+
+# In[7]:
 
 
 import pulp
 
-
-def manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l, delta_jl,
-                                                               s_m_max, pi_m_max):
+def manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l, delta_jl, s_m_max, pi_m_max):
     V = set()
     U = {(m, l): 0 for m in M for l in L}  # Initialize production quantity as zero
-
+    
     # Initialize the problem
     follower_problem = pulp.LpProblem("Manufacturing_Facility_Selection", pulp.LpMinimize)
-
+    
     # Define decision variables for production quantities and plant selection
     u = pulp.LpVariable.dicts("production_quantity", ((m, l) for m in M for l in L), lowBound=0, cat='Continuous')
     v = pulp.LpVariable.dicts("plant_selection", (m for m in M), cat='Binary')
-
+    
     # Calculate consolidated demand for each commodity based on selected customers
     consolidated_demand = {l: sum(delta_jl[j, l] for j in J if X[j] == 1) for l in L}
-
+    
     # Simplified version: Assign all production to the plant with the lowest beta_ml + rho_m for each l
     for l in L:
         min_cost_plant = min(M, key=lambda m: beta_ml[m, l] + rho_m[m])
         U[min_cost_plant, l] = consolidated_demand[l]
         V.add(min_cost_plant)
-
+    
     # Constraints
     # Carbon emissions constraint
     for m in M:
         follower_problem += pulp.lpSum(epsilon_ml[m, l] * u[(m, l)] for l in L) <= s_m_max[m], f"CarbonEmission_{m}"
-
+    
     # Demand satisfaction constraint (assuming your demand calculation matches production)
     for l in L:
         follower_problem += pulp.lpSum(u[(m, l)] for m in M) == consolidated_demand[l], f"DemandSatisfaction_{l}"
-
+    
     # Raw material constraint
     for m in M:
         follower_problem += pulp.lpSum(mu_l[l] * u[(m, l)] for l in L) <= pi_m_max[m] * v[m], f"RawMaterial_{m}"
-
+    
     # Note: This corrected version assumes the decision variables `u` and `v` are properly integrated into your model
     # and that `follower_problem` is where you're adding your constraints and objective.
-
+    
     # You should define an objective for your `follower_problem` and solve it using follower_problem.solve().
-
+    
     return V, U
 
 
-# In[26]:
+# In[8]:
 
 
-V, U = manufacturing_facility_selection_and_production_assignment(best_X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l,
-                                                                  delta_jl, s_m_max, pi_m_max)
+
+V, U = manufacturing_facility_selection_and_production_assignment(best_X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l, delta_jl, s_m_max, pi_m_max)
 
 V_dict = {m: (1 if m in V else 0) for m in M}
 
 
-# In[27]:
+# In[9]:
 
 
 def determine_customer_hub(Omega_jh, H):
@@ -255,7 +271,7 @@ def determine_customer_hub(Omega_jh, H):
     Parameters:
     - Omega_jh: Dictionary with keys as (j, h) and values indicating selection (1 or 0).
     - H: List of hubs.
-
+    
     Returns:
     - customer_to_hub: Dictionary mapping each customer to their chosen hub location.
     """
@@ -266,7 +282,7 @@ def determine_customer_hub(Omega_jh, H):
     return customer_to_hub
 
 
-# In[28]:
+# In[10]:
 
 
 def calculate_savings(I, d_ij, x, Omega_jh, H):
@@ -282,8 +298,7 @@ def calculate_savings(I, d_ij, x, Omega_jh, H):
     customer_to_hub = determine_customer_hub(Omega_jh, H)  # Determine hubs for customers
     savings = {}
     for i in I:
-        location_i = customer_to_hub.get(i,
-                                         i)  # Use hub's location if customer chose a hub, else use customer's location
+        location_i = customer_to_hub.get(i, i)  # Use hub's location if customer chose a hub, else use customer's location
 
         for j in I:
             location_j = customer_to_hub.get(j, j)  # Same for customer j
@@ -293,7 +308,7 @@ def calculate_savings(I, d_ij, x, Omega_jh, H):
     return savings
 
 
-# In[29]:
+# In[11]:
 
 
 def calculate_total_demand_per_customer(delta_jl, J, L):
@@ -302,14 +317,13 @@ def calculate_total_demand_per_customer(delta_jl, J, L):
     return total_demand_per_customer
 
 
-# In[30]:
+# In[12]:
 
 
-def vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, delta_jl, x, u, v, Omega_jh, H, t_ij,
-                                                    r_max):
+def vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, delta_jl, x, u, v, Omega_jh, H, t_ij, r_max):
     # Calculate total demand for each customer
     total_demand_per_customer = calculate_total_demand_per_customer(delta_jl, J, L)
-
+    
     # Initialize structures for routing with time consideration
     routes = {k: [] for k in K}
     load = {k: 0 for k in K}
@@ -359,23 +373,22 @@ def vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, d
     # Report if any selected customers could not be assigned
     unassigned_customers = [j for j, route in customer_route.items() if route is None]
     if unassigned_customers:
-        print(
-            f"Warning: Not all selected customers could be assigned to routes. Unassigned customers: {unassigned_customers}")
+        print(f"Warning: Not all selected customers could be assigned to routes. Unassigned customers: {unassigned_customers}")
 
     return routes, used_vehicles
 
 
-# In[31]:
+# In[13]:
 
 
 def enhanced_routing_output(routes, customer_to_hub):
     """
     Enhance the routing output to include information about hub assignments for customers.
-
+    
     Parameters:
     - routes: Dictionary of routes per vehicle.
     - customer_to_hub: Dictionary mapping customers to their chosen hub.
-
+    
     Returns:
     - A dictionary with detailed routing information including hub assignments.
     """
@@ -391,41 +404,40 @@ def enhanced_routing_output(routes, customer_to_hub):
                 # Direct delivery to customer or a hub itself
                 route_details.append({'direct': customer_or_hub})
         detailed_routes[k] = route_details
-
+    
     return detailed_routes
 
 
-# In[32]:
+# In[14]:
 
 
 customer_to_hub = determine_customer_hub(Omega_jh, H)
 
 
-# In[33]:
+# In[15]:
 
 
 def generate_initial_solution():
     # Step 1: Customer selection
     X = customer_selection(J, L, K, H, p_l, f_jlk, delta_jl, Omega_jh, Lambda)
-
+    
     # Step 2: Manufacturing facility selection and production assignment
-    V, U = manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l,
-                                                                      delta_jl, s_m_max, pi_m_max)
-
+    V, U = manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l, delta_jl, s_m_max, pi_m_max)
+    
     # Convert set V to dict for compatibility
     V_dict = {m: (1 if m in V else 0) for m in M}
-
+    
     # Step 3: Vehicle routing assignment with time constraint
-    routes, used_vehicles_set = vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, delta_jl, X,
-                                                                                U, V_dict, Omega_jh, H, t_ij, r_max)
-
+    routes, used_vehicles_set = vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, delta_jl, X, U, V_dict, Omega_jh, H, t_ij, r_max)
+    
     used_vehicles = {k: 1 if k in used_vehicles_set else 0 for k in K}
 
+    
     manufacturing_costs = calculate_follower_objective(M, L, beta_ml, rho_m, U, V_dict)
-    profit = calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, routes, c_k, theta_ml, U, X,
-                              used_vehicles)
+    profit = calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, routes, c_k, theta_ml, U, X, used_vehicles)
     emissions = calculate_emissions(I, K, M, L, e_ijk, d_ij, routes, epsilon_ml, U, varepsilon, d_m0, V_dict)
-
+    
+    
     # Combine all parts of the solution
     initial_solution = {
         'x': X,
@@ -433,24 +445,23 @@ def generate_initial_solution():
         'u': U,
         'y': routes,
         'z': used_vehicles,
-
+        
         # Initial objective values can be calculated based on the initial decision variables
         "emissions_value": emissions,
         "profit_value": profit,
         "follower_objective": manufacturing_costs
     }
-
+    
     return initial_solution
 
 
-# In[34]:
+# In[16]:
 
 
-def extract_objective_values(solutions, I, J, H, K, L, M, e_ijk, d_ij, epsilon_ml, varepsilon, d_m0, p_l, f_jlk,
-                             delta_jl, Omega_jh, r_k, c_k, theta_ml, beta_ml, rho_m):
+def extract_objective_values(solutions, I, J, H, K, L, M, e_ijk, d_ij, epsilon_ml, varepsilon, d_m0, p_l, f_jlk, delta_jl, Omega_jh, r_k, c_k, theta_ml, beta_ml, rho_m):
     solutions_list = [solutions]
     objective_values = {'L_emissions': [], 'L_profit': [], 'follower_objective': []}
-
+    
     for solution in solutions_list:
         # Decompose the solution into its components
         y = solution['y']
@@ -461,15 +472,14 @@ def extract_objective_values(solutions, I, J, H, K, L, M, e_ijk, d_ij, epsilon_m
 
         # Calculate each objective value
         emissions_value = calculate_emissions(I, K, M, L, e_ijk, d_ij, y, epsilon_ml, u, varepsilon, d_m0, v)
-        profit_value = calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, y, c_k, theta_ml, u, x,
-                                        z)
+        profit_value = calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, y, c_k, theta_ml, u, x, z)
         follower_value = calculate_follower_objective(M, L, beta_ml, rho_m, u, v)
 
         # Append the calculated values to the respective lists in the dictionary
         objective_values['L_emissions'].append(emissions_value)
         objective_values['L_profit'].append(profit_value)
         objective_values['follower_objective'].append(follower_value)
-
+    
     return objective_values
 
 
@@ -490,9 +500,11 @@ def calculate_emissions(I, K, M, L, e_ijk, d_ij, y, epsilon_ml, u, varepsilon, d
             epsilon_value = epsilon_ml.get((m, l), 0)  # Default to 0 if not found
             u_value = u.get((m, l), 0)  # Default to 0 if not found
             emissions += epsilon_value * u_value
-
+            
     # Sum emissions for transporting goods from manufacturing to depot
     for m in M:
+        #average_emissions_factor = 0.1  # This should be based on your data or assumptions
+        #emissions_factor = varepsilon.get(m, average_emissions_factor)
         d_m0_value = d_m0.get((m, 0), 0)
         emissions += varepsilon * d_m0_value * v.get(m, 0)
 
@@ -523,8 +535,7 @@ def calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, y, c
                 for k in K:
                     for j in J:
                         for h in H:
-                            profit -= c_k[k] * d_ij[i, i_prime] * y.get((i, i_prime, k), 0) * (
-                                        1 - Omega_jh.get((j, h), 0))
+                            profit -= c_k[k] * d_ij[i, i_prime] * y.get((i, i_prime, k), 0) * (1 - Omega_jh.get((j, h), 0))
     # Deduct manufacturing costs
     for m in M:
         for l in L:
@@ -543,21 +554,14 @@ def calculate_follower_objective(M, L, beta_ml, rho_m, u, v):
     return manufacturing_costs
 
 
-# In[39]:
 
 
-#solutions = generate_initial_solution()
-#extract_objective_values(solutions, I, J, H, K, L, M, e_ijk, d_ij, epsilon_ml, varepsilon, d_m0, p_l, f_jlk, delta_jl,
-#                         Omega_jh, r_k, c_k, theta_ml, beta_ml, rho_m)
-
-for b in range(30):
-    solutions = generate_initial_solution()
-    final = extract_objective_values(solutions, I, J, H, K, L, M, e_ijk, d_ij, epsilon_ml, varepsilon, d_m0, p_l, f_jlk, delta_jl, Omega_jh, r_k, c_k, theta_ml, beta_ml, rho_m)
-    print(f"Run {b+1}: {final}")
 
 # In[ ]:
 
 
-
-
+for b in range(30):
+    solutions = generate_initial_solution()
+    final = extract_objective_values(solutions, I, J, H, K, L, M, e_ijk, d_ij, epsilon_ml, varepsilon, d_m0, p_l, f_jlk, delta_jl, Omega_jh, r_k, c_k, theta_ml, beta_ml, rho_m)
+    print(f"Run {1+b}: {final}")
 
