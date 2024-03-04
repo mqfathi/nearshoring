@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[4]:
 
 
 import random
@@ -31,7 +31,7 @@ q_k_max = {}
 d_m0 = {}
 
 
-# In[3]:
+# In[5]:
 
 
 K1 = [1,2,3,4, 5, 6, 7, 8, 9, 10]
@@ -140,7 +140,7 @@ for j in J:
 t_ij = {key: d_ij[key] * varphi[key[1]] + h_i[key[1]] if key[1] in h_i else d_ij[key] * varphi[key[1]] for key in d_ij}   
 
 
-# In[4]:
+# In[6]:
 
 
 def customer_selection(J, L, K, H, p_l, f_jlk, delta_jl, Omega_jh, Lambda):
@@ -176,7 +176,7 @@ def customer_selection(J, L, K, H, p_l, f_jlk, delta_jl, Omega_jh, Lambda):
     return best_X
 
 
-# In[5]:
+# In[7]:
 
 
 def manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l, delta_jl, s_m_max, pi_m_max):
@@ -216,7 +216,7 @@ def manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_
 
 
 
-# In[6]:
+# In[8]:
 
 
 def determine_customer_hub(Omega_jh, H):
@@ -309,13 +309,13 @@ def vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, d
 
     # Report if any selected customers could not be assigned
     unassigned_customers = [j for j, route in customer_route.items() if route is None]
-    if unassigned_customers:
-        print(f"Warning: Not all selected customers could be assigned to routes. Unassigned customers: {unassigned_customers}")
+    #if unassigned_customers:
+    #    print(f"Warning: Not all selected customers could be assigned to routes. Unassigned customers: {unassigned_customers}")
 
     return routes, used_vehicles
 
 
-# In[22]:
+# In[10]:
 
 
 def calculate_emissions(I, K, M, L, e_ijk, d_ij, y, epsilon_ml, u, varepsilon, d_m0, v):
@@ -346,44 +346,37 @@ def calculate_emissions(I, K, M, L, e_ijk, d_ij, y, epsilon_ml, u, varepsilon, d
     return emissions
 
 
+
 def calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, y, c_k, theta_ml, u, x, Z):
     profit = 0
-
-    # Pre-compute adjusted delivery fees and product costs
-    adjusted_fees = {
-        (j, l, k, h): f_jlk.get((j, l, k), 0) * (1 - Omega_jh.get((j, h), 0))
-        for j in J for l in L for k in K for h in H
-    }
-
-    # Calculate revenue from sales and delivery fees
-    profit_contribution = sum(
-        (p_l[l] + adjusted_fees[j, l, k, h]) * delta_jl[j, l] * x[j]
-        for j in J for l in L for k in K for h in H
-    )
-    profit += profit_contribution
-
+    z = {vehicle_id: 1 for vehicle_id in Z}
+    # Revenue from sales and delivery fees, adjusted for customer preferences for delivery mode
+    for j in J:
+        for l in L:
+            for k in K:
+                # Iterate over all H values
+                for h in H:
+                    # Safely get the value from f_jlk with a default of 0
+                    f_jlk_value = f_jlk.get((j, l, k), 0)
+                    # Calculate the profit contribution for this j, l, k combination
+                    profit_contribution = (p_l[l] + f_jlk_value * (1 - Omega_jh.get((j, h), 0))) * delta_jl[j, l] * x[j]
+                    profit += profit_contribution
     # Deduct costs for vehicle use
-    vehicle_use_cost = sum(r_k[k] for k in Z)
-    profit -= vehicle_use_cost
-
-    # Pre-compute transportation cost adjustments
-    transport_cost_adjustments = {
-        (i, i_prime, k, j, h): c_k[k] * d_ij[i, i_prime] * (1 - Omega_jh.get((j, h), 0))
-        for i in I for i_prime in I if i != i_prime
-        for k in K for j in J for h in H
-    }
-
-    # Deduct transportation costs
-    transportation_costs = sum(
-        transport_cost_adjustments[i, i_prime, k, j, h] * y.get((i, i_prime, k), 0)
-        for i, i_prime, k, j, h in transport_cost_adjustments
-    )
-    profit -= transportation_costs
-
+    for k in K:
+        profit -= r_k[k] * z[k]
+    # Deduct transportation costs, adjusted for delivery mode preference and actual route usage
+    for i in I:
+        for i_prime in I:
+            if i != i_prime:
+                for k in K:
+                    tempt = c_k[k] * d_ij[i, i_prime] * y.get((i, i_prime, k), 0)
+                    for j in J:
+                        for h in H:
+                            profit -= tempt * (1 - Omega_jh.get((j, h), 0))
     # Deduct manufacturing costs
-    manufacturing_costs = sum(theta_ml[m, l] * u[m, l] for m in M for l in L)
-    profit -= manufacturing_costs
-
+    for m in M:
+        for l in L:
+            profit -= theta_ml[m, l] * u[m, l]
     return profit
 
 
@@ -399,7 +392,7 @@ def calculate_follower_objective(M, L, beta_ml, rho_m, u, v):
     return manufacturing_costs
 
 
-# In[25]:
+# In[11]:
 
 
 def generate_initial_solution():
@@ -433,11 +426,16 @@ def generate_initial_solution():
     return initial_solution
 
 
-# In[9]:
+# In[12]:
 
 
 for b in range(30):
     solutions = generate_initial_solution()
     print(f"Run {1+b}: {solutions}")
+
+
+# In[ ]:
+
+
 
 
