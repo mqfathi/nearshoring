@@ -1,444 +1,364 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 # coding: utf-8
+
+# In[1]:
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+data = [
+  {'L_emissions': 15446967.17, 'L_profit': 1785383116.0, 'follower_objective': 755717},
+ {'L_emissions': 15274824.17, 'L_profit': 1762107187.0, 'follower_objective': 747284},
+ {'L_emissions': 14948677.17, 'L_profit': 1722699478.0, 'follower_objective': 731813},
+ {'L_emissions': 15344705.17, 'L_profit': 1763505406.0, 'follower_objective': 751358},
+ {'L_emissions': 15414243.17, 'L_profit': 1768881543.0, 'follower_objective': 754448},
+ {'L_emissions': 15719307.17, 'L_profit': 1796607419.0, 'follower_objective': 769790},
+ {'L_emissions': 15318458.17, 'L_profit': 1762869066.0, 'follower_objective': 749585},
+ {'L_emissions': 15434969.17, 'L_profit': 1774606309.0, 'follower_objective': 755480},
+ {'L_emissions': 15699461.17, 'L_profit': 1807046639.0, 'follower_objective': 768335},
+ {'L_emissions': 15302661.17, 'L_profit': 1760790938.0, 'follower_objective': 748820},
+ {'L_emissions': 15214808.17, 'L_profit': 1747916285.0, 'follower_objective': 745286},
+ {'L_emissions': 15483955.17, 'L_profit': 1784031547.0, 'follower_objective': 757589},
+ {'L_emissions': 15297438.17, 'L_profit': 1759551842.0, 'follower_objective': 748445},
+ {'L_emissions': 15142367.17, 'L_profit': 1747593918.0, 'follower_objective': 741083},
+ {'L_emissions': 15168995.17, 'L_profit': 1751252135.0, 'follower_objective': 742004},
+{'L_emissions': 15221548.17, 'L_profit': 1755733324.0, 'follower_objective': 744575},
+{'L_emissions': 15267282.17, 'L_profit': 1759708814.0, 'follower_objective': 747233},
+{'L_emissions': 15177619.17, 'L_profit': 1747439726.0, 'follower_objective': 742610},
+{'L_emissions': 15098749.17, 'L_profit': 1741572727.0, 'follower_objective': 739094},
+{'L_emissions': 15154373.17, 'L_profit': 1746224600.0, 'follower_objective': 741482},
+{'L_emissions': 15262577.17, 'L_profit': 1763396874.0, 'follower_objective': 746849},
+{'L_emissions': 15177786.17, 'L_profit': 1754531102.0, 'follower_objective': 742187},
+{'L_emissions': 15405728.17, 'L_profit': 1761448950.0, 'follower_objective': 754340},
+{'L_emissions': 15344466.17, 'L_profit': 1760476215.0, 'follower_objective': 751418},
+{'L_emissions': 15383543.17, 'L_profit': 1768939142.0, 'follower_objective': 752987},
+{'L_emissions': 15235161.17, 'L_profit': 1756864256.0, 'follower_objective': 744884},
+ {'L_emissions': 15632460.17, 'L_profit': 1795687087.0, 'follower_objective': 765365},
+ {'L_emissions': 15713009.17, 'L_profit': 1804684738.0, 'follower_objective': 769469},
+ {'L_emissions': 15263962.17, 'L_profit': 1754397145.0, 'follower_objective': 747062},
+ {'L_emissions': 15442217.17, 'L_profit': 1776500805.0, 'follower_objective': 755606}
+]
+
+
+# Create DataFrame
+df = pd.DataFrame(data)
+
+# Sort the DataFrame
+df_sorted = df.sort_values(by=['L_profit', 'L_emissions', 'follower_objective'], ascending=[False, True, True])
+
+# Plotting
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+ax.scatter(df_sorted['L_emissions'], df_sorted['L_profit'], df_sorted['follower_objective'], c='blue', marker='o')
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+plt.title('3D Scatter Plot Sorted by Profit, Emission, and Follower')
+plt.show()
+
 
 # In[2]:
 
 
-import random
-import pulp
 import numpy as np
+from scipy.stats import gaussian_kde
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd
 
-p_l = {}
-delta_jl = {}
-r_k = {}
-d_ij = {}
-theta_ml = {}
-c_k = {}
-beta_ml = {}
-epsilon_ml = {}
-mu_l = {}
-rho_m = {}
-q_k_max = {}
-h_i1 = {}
-h_i={}
-pi_m_max = {}
-s_m_max = {}
-common_jk = {}
-e_ijk = {}
-varepsilon = {}
-varphi = {}
-q_k_max = {}
-d_m0 = {}
+# Assuming 'data' and DataFrame 'df' are defined as above
+
+# Generate KDE for Emissions and Profit
+xy = np.vstack([df['L_emissions'], df['L_profit']])
+kde = gaussian_kde(xy)
+
+# Create grid for contour
+xmin, xmax = df['L_emissions'].min(), df['L_emissions'].max()
+ymin, ymax = df['L_profit'].min(), df['L_profit'].max()
+Xgrid, Ygrid = np.meshgrid(np.linspace(xmin, xmax, 50), np.linspace(ymin, ymax, 50))
+Zgrid = kde(np.vstack([Xgrid.ravel(), Ygrid.ravel()])).reshape(Xgrid.shape)
+
+
+
+
+# Plotting
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# 3D scatter plot
+scatter = ax.scatter(df['L_emissions'], df['L_profit'], df['follower_objective'], c='blue', marker='o', depthshade=True)
+
+# Contour plot on the bottom plane
+z_min_offset = df['follower_objective'].min()  # Using the minimum follower objective for the contour base
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+
+# Contour plot on the x, z plane (emissions-follower objective)
+#ax.contour(Xgrid, Zgrid, Zgrid, zdir='y', levels=10, cmap='coolwarm', alpha=0.5)
+
+# Contour plot on the y, z plane (profit-follower objective)
+#ax.contour(XZgrid, Ygrid, zZgrid, zdir='x', offset=xmin, levels=10, cmap='cividis', alpha=0.5)
+
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+# Adjusting z-axis limits to start from the minimum follower objective
+z_min = df['follower_objective'].min()
+z_max = df['follower_objective'].max()
+ax.set_zlim(z_min, z_max)
+
+plt.colorbar(scatter, ax=ax, label='Follower Objective')
+plt.title('3D Scatter Plot with KDE Contours on Emissions-Profit Plane')
+plt.show()
 
 
 # In[3]:
 
 
-K1 = [1,2,3,4]
-K2 = [5,6,7,8]
-K3 = [9,10,11,12]
-K4 = [13,14,15,16]
-K5 = [17,18,19,20]
-K6 = [21,22,23,24]
-K = K1 + K2 + K3 + K4 + K5 + K6
-L= [1,2,3]
-I = list(range(301))
-J = list(range(1, 288))
-H = [289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300]
-M = [1,2,3,4, 5] # Update the value of L to 
+import pandas as pd
+import numpy as np
 
+# Convert to DataFrame
+df = pd.DataFrame(data)
 
-for l in L:
-    p_l[l] = random.randint(50, 100)  # Assigning random values between 0 and 20
-    
-for j in J:
-    for l in L:
-        delta_jl[(j, l)] = random.randint(0, 200)  # Assigning random values between 0 and 20
-        
-for key in K:
-    r_k[key] = random.randint(50, 75)
+# Normalize the objective functions
+norm_df = pd.DataFrame()
+for col in df.columns:
+    min_val = df[col].min()
+    max_val = df[col].max()
+    norm_df[col] = (df[col] - min_val) / (max_val - min_val)
 
-for i in I:
-    for j in I:
-        if i != j:
-            d_ij[(i,j)] = round(random.uniform(0.01, 4), 2)  # Assigning random values between 0 and 20
-        if i == j:
-            d_ij[(i,j)] = 0
+# Calculate sums for entropy calculation
+D_n = norm_df.sum(axis=1)
 
-d_m0 = {(m, 0): random.randint(1000, 1500) for m in M}
+# Calculate entropy
+e_n = np.zeros(len(df))
+for i, row in norm_df.iterrows():
+    for col in norm_df.columns:
+        phi = row[col]
+        e_n[i] += (phi / D_n[i]) * np.log(phi / D_n[i])
 
-for m in M:
-    for l in L:
-        theta_ml[(m,l)] = random.randint(20, 45)
-        
-for k in K:
-    c_k[k] =  round(random.uniform(1, 1.5), 1)  # Adjust the range as needed
+# Normalize entropy (avoid division by zero)
+e_n = np.nan_to_num(e_n)  # Replace NaNs with zeros
+E = e_n.sum()
 
-for key in K:
-    q_k_max[key] = random.randint(200, 500)
+# Calculate weights
+W_n = (1 / (len(df) - E) * (1 - e_n)) / ((1 / (len(df) - E) * (1 - e_n)).sum())
 
-for m in M:
-    rho_m[m] = random.randint(200, 350)  # Assigning random values between 0 and 20
+# Add calculated weights to DataFrame for visualization
+df['Weight'] = W_n
 
-for l in L:
-    mu_l[l] = random.randint(1, 5)  # Assigning random values between 0 and 20
-
-for m in M:
-    for l in L:
-        beta_ml[(m,l)] = random.randint(10, 20)  # Assigning random values between 0 and 20
-
-for m in M:
-    for l in L:
-        epsilon_ml[(m,l)] = random.randint(100, 700)  # Assigning random values between 0 and 20
-
-for key in M:
-    s_m_max[key] = random.randint(1000, 4000)  # Assigning random values between 0 and 20
-
-for idx in I:
-    h_i1[idx] = round(random.uniform(20, 60), 2)  # Assigning random values between 3 and 4 (inclusive)
-# Divide h_i1 values by 60 to convert minutes to hours
-h_i = {key: value / 60 for key, value in h_i1.items()}
-    
-for i in I:
-    for j in J:
-        for k in K:
-            e_ijk[i, j, k] = round(random.uniform(0.3, 1.2), 2)
-
-for j in J:
-    for k in K:
-        common_jk[(j, k)] = random.randint(15, 75)  # Assigning random values between 0 and 20
-
-f_jlk = {}
-for j in J:
-    for l in L:
-        for k in K:
-            f_jlk[j, l, k] = common_jk[j, k]
-
-for key in M:
-    pi_m_max[key] = random.randint(2000, 4000)  # Assigning random values between 0 and 20
-
-r_max = round(random.uniform(8, 12), 2)
-gamma = random.randint(10, len(J))
-Lambda = random.randint(10,len(J))
-g_min = random.randint(5000000,15000000)
-
-varepsilon = round(random.uniform(0.3, 1.2), 2)    # Assigning random values between 0 and 20   
-
-for i in I:
-    varphi[i] = round(random.uniform(0.4, 1), 2)    # Assigning random values between 0 and 20
-
-
-Omega_jh = {(j, h): 0 for j in J for h in H}
-# Randomly assign each customer to exactly one hub
-for j in J:
-    # Randomly choose a hub for this customer
-    assigned_hub = random.randint(1, len(H))
-    Omega_jh[(j, assigned_hub)] = random.randint(0, 1)
-    
-
-# Update t_ij calculation to include the corrected h_i
-# Assuming varphi is applied correctly as a scaling factor for d_ij to time, and h_i adds a fixed service time at node i
-t_ij = {key: d_ij[key] * varphi[key[1]] + h_i[key[1]] if key[1] in h_i else d_ij[key] * varphi[key[1]] for key in d_ij}   
+df.head()  # Show the first few rows to verify the calculations
 
 
 # In[4]:
 
 
-def customer_selection(J, L, K, H, p_l, f_jlk, delta_jl, Omega_jh, Lambda):
-    # Initialize decision variable X
-    X = {j: 0 for j in J}
-    best_profit = -np.inf
-    best_X = None
-    
-    # Initialize an initial solution randomly
-    selected_customers = random.sample(J, Lambda)
-    for j in selected_customers:
-        X[j] = 1
-    
-    # Calculate the initial profit
-    profit = sum(p_l[l] + f_jlk[j, l, k]*(1-Omega_jh[j, h])*delta_jl[j, l] 
-                 for j in J for l in L for k in K for h in H if X[j] == 1)
-    if profit > best_profit:
-        best_profit = profit
-        best_X = X.copy()
-    
-    # Generate all possible combinations of (0,1) in X
-    for j in J:
-        X_temp = X.copy()
-        X_temp[j] = 1 - X_temp[j]  # Toggle the selection of customer j
-        profit_temp = sum(p_l[l] + f_jlk[j, l, k]*(1-Omega_jh[j, h])*delta_jl[j, l] 
-                          for j in J for l in L for k in K for h in H if X_temp[j] == 1)
-        
-        # If the new profit is better, update best_X and best_profit
-        if profit_temp > best_profit:
-            best_profit = profit_temp
-            best_X = X_temp.copy()
-    
-    return best_X
+# Adjusting the grid creation for xz and yz contours
+
+# x, z contour grid
+Zgrid_xz, Xgrid_xz = np.meshgrid(np.linspace(df_sorted_corrected['follower_objective'].min(), df_sorted_corrected['follower_objective'].max(), 50), 
+                                 np.linspace(xmin, xmax, 50))
+XZgrid = kde_xz(np.vstack([Xgrid_xz.ravel(), Zgrid_xz.ravel()])).reshape(Xgrid_xz.shape)
+
+# y, z contour grid
+Zgrid_yz, Ygrid_yz = np.meshgrid(np.linspace(df_sorted_corrected['follower_objective'].min(), df_sorted_corrected['follower_objective'].max(), 50), 
+                                 np.linspace(ymin, ymax, 50))
+YZgrid = kde_yz(np.vstack([Ygrid_yz.ravel(), Zgrid_yz.ravel()])).reshape(Ygrid_yz.shape)
+
+# Plotting with corrected ranks annotated and all KDE contours
+fig = plt.figure(figsize=(16, 12))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate each point with its corrected rank
+for i, row in df_sorted_corrected.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Contour plot on the bottom plane (emissions-profit)
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+# Contour plot on the x, z plane (emissions-follower objective)
+ax.contour(Xgrid_xz, Zgrid_xz, XZgrid, zdir='y', offset=ymax, levels=10, cmap='coolwarm', alpha=0.5)
+
+# Contour plot on the y, z plane (profit-follower objective)
+ax.contour(Ygrid_yz, Zgrid_yz, YZgrid, zdir='x', offset=xmin, levels=10, cmap='cividis', alpha=0.5)
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+plt.title('3D Scatter Plot with Corrected Ranks and Multiple KDE Contours')
+plt.show()
 
 
 # In[5]:
 
 
-def manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l, delta_jl, s_m_max, pi_m_max):
-    V = set()
-    U = {(m, l): 0 for m in M for l in L}  # Initialize production quantity as zero
-    
-    # Initialize the problem
-    follower_problem = pulp.LpProblem("Manufacturing_Facility_Selection", pulp.LpMinimize)
-    
-    # Define decision variables for production quantities and plant selection
-    u = pulp.LpVariable.dicts("production_quantity", ((m, l) for m in M for l in L), lowBound=0, cat='Continuous')
-    v = pulp.LpVariable.dicts("plant_selection", (m for m in M), cat='Binary')
-    
-    # Calculate consolidated demand for each commodity based on selected customers
-    consolidated_demand = {l: sum(delta_jl[j, l] for j in J if X[j] == 1) for l in L}
-    
-    # Simplified version: Assign all production to the plant with the lowest beta_ml + rho_m for each l
-    for l in L:
-        min_cost_plant = min(M, key=lambda m: beta_ml[m, l] + rho_m[m])
-        U[min_cost_plant, l] = consolidated_demand[l]
-        V.add(min_cost_plant)
-    
-    # Constraints
-    # Carbon emissions constraint
-    for m in M:
-        follower_problem += pulp.lpSum(epsilon_ml[m, l] * u[(m, l)] for l in L) <= s_m_max[m], f"CarbonEmission_{m}"
-    
-    # Demand satisfaction constraint (assuming your demand calculation matches production)
-    for l in L:
-        follower_problem += pulp.lpSum(u[(m, l)] for m in M) == consolidated_demand[l], f"DemandSatisfaction_{l}"
-    
-    # Raw material constraint
-    for m in M:
-        follower_problem += pulp.lpSum(mu_l[l] * u[(m, l)] for l in L) <= pi_m_max[m] * v[m], f"RawMaterial_{m}"
-    
-    return V, U
+# Adjust normalization based on preference direction
+norm_df_corrected = pd.DataFrame()
+for col in df.columns[:-1]:  # Exclude the 'Weight' column
+    min_val = df[col].min()
+    max_val = df[col].max()
+    if col == 'L_profit':  # Invert normalization for L_profit
+        norm_df_corrected[col] = (max_val - df[col]) / (max_val - min_val)
+    else:  # Lower is better for L_emissions and follower_objective
+        norm_df_corrected[col] = (df[col] - min_val) / (max_val - min_val)
 
+# Recalculate sums for entropy calculation
+D_n_corrected = norm_df_corrected.sum(axis=1)
+
+# Recalculate entropy
+e_n_corrected = np.zeros(len(df))
+for i, row in norm_df_corrected.iterrows():
+    for col in norm_df_corrected.columns:
+        phi = row[col]
+        e_n_corrected[i] += (phi / D_n_corrected[i]) * np.log(phi / D_n_corrected[i])
+
+# Normalize entropy (avoid division by zero)
+e_n_corrected = np.nan_to_num(e_n_corrected)  # Replace NaNs with zeros
+E_corrected = e_n_corrected.sum()
+
+# Recalculate weights
+W_n_corrected = (1 / (len(df) - E_corrected) * (1 - e_n_corrected)) / ((1 / (len(df) - E_corrected) * (1 - e_n_corrected)).sum())
+
+# Update DataFrame with corrected weights
+df['Weight_corrected'] = W_n_corrected
+
+# Assign ranks based on corrected weights
+df['Rank_corrected'] = df['Weight_corrected'].rank(method='dense', ascending=False)
+
+# Sort data by corrected rank for better visualization
+df_sorted_corrected = df.sort_values(by='Rank_corrected')
+
+# Plotting with corrected ranks annotated
+fig = plt.figure(figsize=(12, 9))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate each point with its corrected rank
+for i, row in df_sorted_corrected.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+plt.title('3D Scatter Plot with Corrected Annotated Ranks')
+plt.show()
 
 
 # In[6]:
 
 
-def determine_customer_hub(Omega_jh, H):
-    """
-    Determine the hub selected by each customer based on Omega_jh.
-    Parameters:
-    - Omega_jh: Dictionary with keys as (j, h) and values indicating selection (1 or 0).
-    - H: List of hubs.
-    
-    Returns:
-    - customer_to_hub: Dictionary mapping each customer to their chosen hub location.
-    """
-    customer_to_hub = {}
-    for (j, h), selection in Omega_jh.items():
-        if selection == 1:
-            customer_to_hub[j] = h
-    return customer_to_hub
+from scipy.stats import gaussian_kde
+
+# Generate KDE for Emissions and Profit
+xy = np.vstack([df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit']])
+kde = gaussian_kde(xy)
+
+# Create grid for contour
+xmin, xmax = df_sorted_corrected['L_emissions'].min(), df_sorted_corrected['L_emissions'].max()
+ymin, ymax = df_sorted_corrected['L_profit'].min(), df_sorted_corrected['L_profit'].max()
+Xgrid, Ygrid = np.meshgrid(np.linspace(xmin, xmax, 50), np.linspace(ymin, ymax, 50))
+Zgrid = kde(np.vstack([Xgrid.ravel(), Ygrid.ravel()])).reshape(Xgrid.shape)
+
+# Plotting with corrected ranks annotated and KDE contours
+fig = plt.figure(figsize=(14, 10))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate each point with its corrected rank
+for i, row in df_sorted_corrected.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Contour plot on the bottom plane
+z_min_offset = df_sorted_corrected['follower_objective'].min() - 100  # Offset to place contour below the lowest point
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+# Adjusting z-axis limits to ensure contour is visible
+ax.set_zlim(z_min_offset, df_sorted_corrected['follower_objective'].max())
+
+plt.title('3D Scatter Plot with Corrected Annotated Ranks and KDE Contours')
+plt.show()
 
 
-def calculate_savings(I, d_ij, x, Omega_jh, H):
-    
-    customer_to_hub = determine_customer_hub(Omega_jh, H)  # Determine hubs for customers
-    savings = {}
-    for i in I:
-        location_i = customer_to_hub.get(i, i)  # Use hub's location if customer chose a hub, else use customer's location
-
-        for j in I:
-            location_j = customer_to_hub.get(j, j)  # Same for customer j
-
-            if i != j and i > 0 and j > 0 and x.get(i, 0) == 1 and x.get(j, 0) == 1:  # Only consider selected customers
-                savings[(i, j)] = d_ij[(0, location_i)] + d_ij[(0, location_j)] - d_ij[(location_i, location_j)]
-    return savings
+# In[7]:
 
 
-def calculate_total_demand_per_customer(delta_jl, J, L):
-    """Calculate total demand for each customer across all commodities."""
-    total_demand_per_customer = {j: sum(delta_jl.get((j, l), 0) for l in L) for j in J}
-    return total_demand_per_customer
+from scipy.stats import gaussian_kde
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Assuming df_sorted_corrected is your DataFrame and it's already sorted by the ranks
+
+# Generate KDE for Emissions and Profit
+xy = np.vstack([df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit']])
+kde = gaussian_kde(xy)
+
+# Create grid for contour
+xmin, xmax = df_sorted_corrected['L_emissions'].min(), df_sorted_corrected['L_emissions'].max()
+ymin, ymax = df_sorted_corrected['L_profit'].min(), df_sorted_corrected['L_profit'].max()
+Xgrid, Ygrid = np.meshgrid(np.linspace(xmin, xmax, 50), np.linspace(ymin, ymax, 50))
+Zgrid = kde(np.vstack([Xgrid.ravel(), Ygrid.ravel()])).reshape(Xgrid.shape)
+
+# Plotting with corrected ranks annotated for top 5 and KDE contours
+fig = plt.figure(figsize=(14, 10))
+ax = fig.add_subplot(111, projection='3d')
+
+# Scatter plot
+scatter = ax.scatter(df_sorted_corrected['L_emissions'], df_sorted_corrected['L_profit'], df_sorted_corrected['follower_objective'], 
+                     c='blue', marker='o', depthshade=True)
+
+# Annotate top 5 points with their corrected rank
+top_5 = df_sorted_corrected.head(5)  # Get top 5
+for i, row in top_5.iterrows():
+    ax.text(row['L_emissions'], row['L_profit'], row['follower_objective'], 
+            '%d' % row['Rank_corrected'], color='red')
+
+# Contour plot on the bottom plane
+z_min_offset = df_sorted_corrected['follower_objective'].min() - 100  # Offset to place contour below the lowest point
+ax.contour(Xgrid, Ygrid, Zgrid, zdir='z', offset=z_min_offset, levels=10, cmap='viridis', alpha=0.5)
+
+# Labeling
+ax.set_xlabel('Emissions')
+ax.set_ylabel('Profit')
+ax.set_zlabel('Follower Objective')
+
+# Adjusting z-axis limits to ensure contour is visible
+ax.set_zlim(z_min_offset, df_sorted_corrected['follower_objective'].max())
+
+plt.title('3D Scatter Plot with Corrected Annotated Ranks for Top 5 and KDE Contours')
+plt.show()
 
 
-def vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, delta_jl, x, u, v, Omega_jh, H, t_ij, r_max):
-    # Calculate total demand for each customer
-    total_demand_per_customer = calculate_total_demand_per_customer(delta_jl, J, L)
-    
-    # Initialize structures for routing with time consideration
-    routes = {k: [] for k in K}
-    load = {k: 0 for k in K}
-    time_spent = {k: 0 for k in K}  # Initialize time spent on each route
-    used_vehicles = set()
-    customer_route = {j: None for j in J if x[j] == 1}  # Only consider selected customers
-
-    # Calculate savings with consideration for customer selection and hub assignments
-    savings = calculate_savings(I, d_ij, x, Omega_jh, H)
-    sorted_savings = sorted(savings.items(), key=lambda x: x[1], reverse=True)
-
-    # Assign routes based on savings, vehicle capacity, and time constraints
-    for (i, j), saving in sorted_savings:
-        for k in K:
-            if customer_route[i] is None and customer_route[j] is None:
-                total_demand_i = total_demand_per_customer.get(i, 0)
-                total_demand_j = total_demand_per_customer.get(j, 0)
-                if load[k] + total_demand_i + total_demand_j <= q_k_max[k]:
-                    # Check if adding these customers respects the time constraint
-                    additional_time = t_ij.get((0, i), 0) + t_ij.get((i, j), 0) + t_ij.get((j, 0), 0)
-                    if time_spent[k] + additional_time <= r_max:
-                        routes[k].append(i)
-                        routes[k].append(j)
-                        load[k] += total_demand_i + total_demand_j
-                        time_spent[k] += additional_time
-                        customer_route[i] = k
-                        customer_route[j] = k
-                        used_vehicles.add(k)
-                        break  # Vehicle found for the pair
-
-    # Attempt to add remaining selected customers to existing routes, considering time
-    for j in J:
-        if x[j] == 1 and customer_route[j] is None:
-            total_demand_j = total_demand_per_customer.get(j, 0)
-            for k in K:
-                if load[k] + total_demand_j <= q_k_max[k]:
-                    # Check time constraint for adding this customer
-                    additional_time = t_ij.get((0, j), 0) + t_ij.get((j, 0), 0)
-                    if time_spent[k] + additional_time <= r_max:
-                        routes[k].append(j)
-                        load[k] += total_demand_j
-                        time_spent[k] += additional_time
-                        customer_route[j] = k
-                        used_vehicles.add(k)
-                        break
-
-    # Report if any selected customers could not be assigned
-    unassigned_customers = [j for j, route in customer_route.items() if route is None]
-    if unassigned_customers:
-        print(f"Warning: Not all selected customers could be assigned to routes. Unassigned customers: {unassigned_customers}")
-
-    return routes, used_vehicles
+# In[ ]:
 
 
-# In[22]:
-
-
-def calculate_emissions(I, K, M, L, e_ijk, d_ij, y, epsilon_ml, u, varepsilon, d_m0, v):
-    emissions = 0
-    # Sum emissions for transportation
-    for i in I:
-        for i_prime in I:
-            if i != i_prime:
-                for k in K:
-                    e_value = e_ijk.get((i, i_prime, k), 0)
-                    d_value = d_ij.get((i, i_prime), 0)
-                    y_value = y.get((i, i_prime, k), 0)
-                    emissions += e_value * d_value * y_value
-    # Sum emissions for manufacturing
-    for m in M:
-        for l in L:
-            epsilon_value = epsilon_ml.get((m, l), 0)  # Default to 0 if not found
-            u_value = u.get((m, l), 0)  # Default to 0 if not found
-            emissions += epsilon_value * u_value
-            
-    # Sum emissions for transporting goods from manufacturing to depot
-    for m in M:
-        #average_emissions_factor = 0.1  # This should be based on your data or assumptions
-        #emissions_factor = varepsilon.get(m, average_emissions_factor)
-        d_m0_value = d_m0.get((m, 0), 0)
-        emissions += varepsilon * d_m0_value * v.get(m, 0)
-
-    return emissions
-
-
-def calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, y, c_k, theta_ml, u, x, Z):
-    profit = 0
-
-    # Pre-compute adjusted delivery fees and product costs
-    adjusted_fees = {
-        (j, l, k, h): f_jlk.get((j, l, k), 0) * (1 - Omega_jh.get((j, h), 0))
-        for j in J for l in L for k in K for h in H
-    }
-
-    # Calculate revenue from sales and delivery fees
-    profit_contribution = sum(
-        (p_l[l] + adjusted_fees[j, l, k, h]) * delta_jl[j, l] * x[j]
-        for j in J for l in L for k in K for h in H
-    )
-    profit += profit_contribution
-
-    # Deduct costs for vehicle use
-    vehicle_use_cost = sum(r_k[k] for k in Z)
-    profit -= vehicle_use_cost
-
-    # Pre-compute transportation cost adjustments
-    transport_cost_adjustments = {
-        (i, i_prime, k, j, h): c_k[k] * d_ij[i, i_prime] * (1 - Omega_jh.get((j, h), 0))
-        for i in I for i_prime in I if i != i_prime
-        for k in K for j in J for h in H
-    }
-
-    # Deduct transportation costs
-    transportation_costs = sum(
-        transport_cost_adjustments[i, i_prime, k, j, h] * y.get((i, i_prime, k), 0)
-        for i, i_prime, k, j, h in transport_cost_adjustments
-    )
-    profit -= transportation_costs
-
-    # Deduct manufacturing costs
-    manufacturing_costs = sum(theta_ml[m, l] * u[m, l] for m in M for l in L)
-    profit -= manufacturing_costs
-
-    return profit
-
-
-
-def calculate_follower_objective(M, L, beta_ml, rho_m, u, v):
-    # Manufacturing cost minimization objective
-    manufacturing_costs = 0
-    for m in M:
-        for l in L:
-            manufacturing_costs += beta_ml[m, l] * u.get((m, l), 0)
-        manufacturing_costs += rho_m[m] * v.get(m, 0)
-
-    return manufacturing_costs
-
-
-# In[25]:
-
-
-def generate_initial_solution():
-    # Step 1: Customer selection
-    X = customer_selection(J, L, K, H, p_l, f_jlk, delta_jl, Omega_jh, Lambda)
-    
-    # Step 2: Manufacturing facility selection and production assignment
-    V, U = manufacturing_facility_selection_and_production_assignment(X, M, L, J, beta_ml, rho_m, epsilon_ml, mu_l, delta_jl, s_m_max, pi_m_max)
-    
-    # Convert set V to dict for compatibility
-    V_dict = {m: (1 if m in V else 0) for m in M}
-    # Step 3: Vehicle routing assignment with time constraint
-    routes, used_vehicles_set = vehicle_routing_assignment_with_time_constraint(I, J, K, d_ij, q_k_max, L, delta_jl, X, U, V_dict, Omega_jh, H, t_ij, r_max)
-    
-    used_vehicles = {k: 1 if k in used_vehicles_set else 0 for k in K}
-
-    manufacturing_costs = calculate_follower_objective(M, L, beta_ml, rho_m, U, V_dict)
-    profit = calculate_profit(I, J, H, K, L, M, p_l, f_jlk, delta_jl, Omega_jh, r_k, routes, c_k, theta_ml, U, X, used_vehicles)
-    emissions = calculate_emissions(I, K, M, L, e_ijk, d_ij, routes, epsilon_ml, U, varepsilon, d_m0, V_dict)
-    
-    
-    # Combine all parts of the solution
-    initial_solution = {
-        
-        # Initial objective values can be calculated based on the initial decision variables
-        "emissions_value": emissions,
-        "profit_value": profit,
-        "follower_objective": manufacturing_costs
-    }
-    
-    return initial_solution
-
-
-# In[9]:
-
-
-for b in range(30):
-    solutions = generate_initial_solution()
-    print(f"Run {1+b}: {solutions}")
 
 
